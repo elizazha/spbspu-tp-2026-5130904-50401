@@ -126,3 +126,33 @@ std::istream& zhuravleva::operator>>(std::istream& in, SllLitIO&& dest)
   dest.ref = std::stoll(value);
   return in;
 }
+
+std::istream& zhuravleva::operator>>(std::istream& in, StringIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
+    return in;
+  }
+  return std::getline(in >> DelimiterIO{{'"'}}, dest.ref, '"');
+}
+
+std::istream& zhuravleva::operator>>(std::istream& in, KeyValueIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
+    return in;
+  }
+  if (dest.key == "key1" && !dest.used[0]) {
+    in >> DoubleLitIO{dest.data.key1};
+    dest.used[0] = true;
+  } else if (dest.key == "key2" && !dest.used[1]) {
+    in >> SllLitIO{dest.data.key2};
+    dest.used[1] = true;
+  } else if (dest.key == "key3" && !dest.used[2]) {
+    in >> StringIO{dest.data.key3};
+    dest.used[2] = true;
+  } else {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
+}
