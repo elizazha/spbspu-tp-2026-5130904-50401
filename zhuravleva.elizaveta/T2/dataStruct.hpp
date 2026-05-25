@@ -1,9 +1,10 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
-#include <iosfwd>
 #include <string>
 #include <vector>
 #include <ios>
+#include <istream>
+#include <ostream>
 
 namespace zhuravleva
 {
@@ -55,6 +56,14 @@ namespace zhuravleva
   };
 
 
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, DoubleLitIO&& dest);
+  std::istream& operator>>(std::istream& in, SllLitIO&& dest);
+  std::istream& operator>>(std::istream& in, StringIO&& dest);
+  std::istream& operator>>(std::istream& in, KeyValueIO&& dest);
+  std::istream& operator>>(std::istream& in, DataStruct& dest);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+  bool operator<(const DataStruct& lhs, const DataStruct& rhs);
 }
 
 #endif
