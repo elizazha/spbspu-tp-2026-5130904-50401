@@ -3,6 +3,7 @@
 #include <ostream>
 #include <algorithm>
 #include <string>
+#include <iomanip>
 
 zhuravleva::IOGuard::IOGuard(std::basic_ios< char >& stream):
   stream_(stream),
@@ -182,4 +183,28 @@ std::istream& zhuravleva::operator>>(std::istream& in, DataStruct& dest)
   }
 
   return in;
+}
+
+std::ostream& zhuravleva::operator<<(std::ostream& out, const DataStruct& dest)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry) {
+    return out;
+  }
+  out << "(:key1 ";
+  out << std::fixed << std::setprecision(1) << dest.key1 << "d:";
+  out << "key2 " << dest.key2 << "ll:";
+  out << "key3 " << std::quoted(dest.key3) << ":)";
+  return out;
+}
+
+bool zhuravleva::operator<(const DataStruct& lhs, const DataStruct& rhs)
+{
+  if (lhs.key1 != rhs.key1) {
+    return lhs.key1 < rhs.key1;
+  }
+  if (lhs.key2 != rhs.key2) {
+    return lhs.key2 < rhs.key2;
+  }
+  return lhs.key3.size() < rhs.key3.size();
 }
