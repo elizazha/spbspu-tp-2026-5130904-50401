@@ -156,3 +156,30 @@ std::istream& zhuravleva::operator>>(std::istream& in, KeyValueIO&& dest)
   }
   return in;
 }
+
+std::istream& zhuravleva::operator>>(std::istream& in, DataStruct& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
+    return in;
+  }
+  DataStruct input;
+  std::vector< bool > used(3, false);
+  std::string key;
+
+  in >> DelimiterIO{{'('}} >> DelimiterIO{{':'}};
+  in >> key >> KeyValueIO{key, used, input} >> DelimiterIO{{':'}};
+  in >> key >> KeyValueIO{key, used, input} >> DelimiterIO{{':'}};
+  in >> key >> KeyValueIO{key, used, input} >> DelimiterIO{{':'}};
+  in >> DelimiterIO{{')'}};
+
+  if (!used[0] || !used[1] || !used[2]) {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  if (in) {
+    dest = input;
+  }
+
+  return in;
+}
