@@ -47,12 +47,10 @@ namespace
     if (value.empty()) {
       return false;
     }
-
     const size_t start = value[0] == '-' ? 1 : 0;
     if (start == value.size()) {
       return false;
     }
-
     return std::all_of(value.begin() + start, value.end(), isDigit);
   }
 }
@@ -63,12 +61,68 @@ std::istream& zhuravleva::operator>>(std::istream& in, DelimiterIO&& dest)
   if (!sentry) {
     return in;
   }
-
   char symbol = 0;
   in >> symbol;
   if (std::find(dest.expected.begin(), dest.expected.end(), symbol) == dest.expected.end()) {
     in.setstate(std::ios::failbit);
   }
+  return in;
+}
 
+std::istream& zhuravleva::operator>>(std::istream& in, DoubleLitIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
+    return in;
+  }
+  std::string value;
+  char symbol = 0;
+  while (in.get(symbol)) {
+    if (symbol == 'd' || symbol == 'D') {
+      break;
+    }
+    if (symbol == ':') {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    value += symbol;
+  }
+  if (!in || (symbol != 'd' && symbol != 'D') || !isDoubleLiteral(value)) {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  dest.ref = std::stod(value);
+  return in;
+}
+
+std::istream& zhuravleva::operator>>(std::istream& in, SllLitIO&& dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry) {
+    return in;
+  }
+  std::string value;
+  char symbol = 0;
+  while (in.get(symbol)) {
+    if (symbol == 'l' || symbol == 'L') {
+      break;
+    }
+    if (symbol == ':') {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    value += symbol;
+  }
+  char second = 0;
+  in.get(second);
+  if (!in || !isSllLiteral(value)) {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  if ((symbol != 'l' && symbol != 'L') || (second != 'l' && second != 'L')) {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  dest.ref = std::stoll(value);
   return in;
 }
