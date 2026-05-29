@@ -1,6 +1,8 @@
 #include "polygon.hpp"
 #include <limits>
 #include <istream>
+#include <vector>
+#include <cmath>
 
 namespace
 {
@@ -103,4 +105,47 @@ void zhuravleva::readData(std::istream & in, std::vector< Polygon > & polygons)
   in.clear();
   in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   readData(in, polygons);
+}
+
+bool zhuravleva::operator==(const Point & lhs, const Point & rhs)
+{
+  return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
+double zhuravleva::getArea(const Polygon & polygon)
+{
+  double sum = 0.0;
+  size_t size = polygon.points.size();
+  for (size_t i = 0; i < size; ++i)
+  {
+    size_t next = (i + 1) % size;
+    sum += polygon.points[i].x * polygon.points[next].y;
+    sum -= polygon.points[next].x * polygon.points[i].y;
+  }
+  return std::fabs(sum) / 2.0;
+}
+
+bool zhuravleva::hasEvenVertexes(const Polygon & polygon)
+{
+  return polygon.points.size() % 2 == 0;
+}
+
+bool zhuravleva::hasOddVertexes(const Polygon & polygon)
+{
+  return polygon.points.size() % 2 != 0;
+}
+
+bool zhuravleva::hasNVertexes(const Polygon & polygon, size_t count)
+{
+  return polygon.points.size() == count;
+}
+
+bool zhuravleva::areaLess(const Polygon & lhs, const Polygon & rhs)
+{
+  return getArea(lhs) < getArea(rhs);
+}
+
+bool zhuravleva::vertexesLess(const Polygon & lhs, const Polygon & rhs)
+{
+  return lhs.points.size() < rhs.points.size();
 }
