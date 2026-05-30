@@ -20,7 +20,7 @@ namespace zhuravleva
   void count(std::istream & in, std::ostream & out,
       const std::vector< Polygon > & polygons);
 
-  void same(std::istream & in,  std::ostream & out,
+  void same(std::istream & in, std::ostream & out,
       const std::vector< Polygon > & polygons);
 
   void rightShapes(std::istream & in, std::ostream & out,

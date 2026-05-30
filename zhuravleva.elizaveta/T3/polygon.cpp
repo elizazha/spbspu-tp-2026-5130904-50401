@@ -3,6 +3,9 @@
 #include <istream>
 #include <vector>
 #include <cmath>
+#include <algorithm>
+#include <functional>
+#include <numeric>
 
 namespace
 {
@@ -22,6 +25,29 @@ namespace
     readPoints(in, points, count - 1);
   }
 
+  int getDotProduct(const zhuravleva::Point & first, const zhuravleva::Point & second,
+      const zhuravleva::Point & third)
+  {
+    int firstX = first.x - second.x;
+    int firstY = first.y - second.y;
+    int secondX = third.x - second.x;
+    int secondY = third.y - second.y;
+    return firstX * secondX + firstY * secondY;
+  }
+
+  bool hasRightAngleAtIndex(const zhuravleva::Polygon & polygon, size_t index)
+  {
+    size_t size = polygon.points.size();
+    size_t prev = (index + size - 1) % size;
+    size_t next = (index + 1) % size;
+    return getDotProduct( polygon.points[prev], polygon.points[index], polygon.points[next]) == 0;
+  }
+
+  bool samePointByShift(const zhuravleva::Point & lhs,
+      const zhuravleva::Point & rhs, int shiftX, int shiftY)
+  {
+    return lhs.x + shiftX == rhs.x && lhs.y + shiftY == rhs.y;
+  }
 }
 
 std::istream & zhuravleva::operator>>(std::istream & in, DelimiterIO && dest)
@@ -148,4 +174,31 @@ bool zhuravleva::areaLess(const Polygon & lhs, const Polygon & rhs)
 bool zhuravleva::vertexesLess(const Polygon & lhs, const Polygon & rhs)
 {
   return lhs.points.size() < rhs.points.size();
+}
+
+bool zhuravleva::hasRightAngle(const Polygon & polygon)
+{
+  std::vector< size_t > indexes(polygon.points.size());
+  std::iota(indexes.begin(), indexes.end(), 0);
+  return std::any_of(
+      indexes.begin(),
+      indexes.end(),
+      std::bind(hasRightAngleAtIndex, std::cref(polygon), std::placeholders::_1));
+}
+
+bool zhuravleva::isSame(const Polygon & lhs, const Polygon & rhs)
+{
+  if (lhs.points.size() != rhs.points.size())
+  {
+    return false;
+  }
+  int shiftX = rhs.points.front().x - lhs.points.front().x;
+  int shiftY = rhs.points.front().y - lhs.points.front().y;
+  return std::equal(
+      lhs.points.begin(),
+      lhs.points.end(),
+      rhs.points.begin(),
+      std::bind(samePointByShift,
+          std::placeholders::_1, std::placeholders::_2,
+          shiftX, shiftY));
 }

@@ -7,6 +7,8 @@
 #include <iomanip>
 #include <iterator>
 #include <numeric>
+#include <istream>
+#include <ostream>
 
 namespace
 {
@@ -165,4 +167,27 @@ void zhuravleva::min(std::istream & in, std::ostream & out, const std::vector< P
   {
     throw std::invalid_argument("invalid command");
   }
+}
+
+void zhuravleva::same(std::istream & in, std::ostream & out,
+    const std::vector< Polygon > & polygons)
+{
+  Polygon ref{};
+  if (!(in >> ref))
+  {
+    throw std::invalid_argument("invalid command");
+  }
+  size_t result = std::count_if(
+      polygons.begin(),
+      polygons.end(),
+      std::bind(isSame, std::placeholders::_1, std::cref(ref))
+  );
+  out << result << '\n';
+}
+
+void zhuravleva::rightShapes(std::istream &, std::ostream & out,
+    const std::vector< Polygon > & polygons)
+{
+  size_t result = std::count_if(polygons.begin(), polygons.end(), hasRightAngle);
+  out << result << '\n';
 }
