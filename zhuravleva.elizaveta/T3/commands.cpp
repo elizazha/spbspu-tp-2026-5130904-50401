@@ -18,7 +18,7 @@ namespace
     return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
   }
 
-  void checkLineEnd(std::stream& in)
+  void checkLineEnd(std::istream& in)
   {
     int c = in.peek();
     if (!in)
