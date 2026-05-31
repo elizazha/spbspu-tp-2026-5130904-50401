@@ -9,12 +9,32 @@
 #include <numeric>
 #include <istream>
 #include <ostream>
+#include <limits>
 
 namespace
 {
   bool isNumber(const std::string & str)
   {
     return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
+  }
+
+  void checkLineEnd(std::stream& in)
+  {
+    int c = in.peek();
+    if (!in)
+    {
+      return;
+    }
+    if (c == ' ' || c == '\t')
+    {
+      in.get();
+      checkLineEnd(in);
+      return;
+    }
+    if (c == '\n' && c != std::char_traits< char >::eof())
+    {
+      throw std::invalid_argument("invalid command");
+    }
   }
 }
 
@@ -177,6 +197,7 @@ void zhuravleva::same(std::istream & in, std::ostream & out,
   {
     throw std::invalid_argument("invalid command");
   }
+  checkLineEnd(in);
   size_t result = std::count_if(
       polygons.begin(),
       polygons.end(),
